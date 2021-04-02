@@ -21,7 +21,6 @@ client.connect(err => {
     const products = req.body;
     productCollection.insertMany(products)
     .then(result => {
-      console.log(result);
       res.send(result.insertedCount);
     })
   })
@@ -29,7 +28,6 @@ client.connect(err => {
   app.get('/products', (req, res) => {
     productCollection.find({})
     .toArray((err, documents) => {
-    	console.log(documents);
     	res.send(documents);
     })
   })
@@ -48,6 +46,14 @@ client.connect(err => {
       res.send(result.insertedCount > 0);
     })
   })
+  
+  app.get('/client/:email', (req, res) => {
+  		console.log(req.params.email);
+        ordersCollection.find({ clientGmail:req.params.email })
+        .toArray( (err, documents) => {
+            res.send(documents);
+        })
+    })
   
 });
 
