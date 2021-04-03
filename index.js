@@ -8,7 +8,8 @@ require("dotenv").config();
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
-const port = 5000;
+
+const port = process.env.PORT || 5000;
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ykirh.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -23,6 +24,16 @@ client.connect(err => {
     .then(result => {
       res.send(result.insertedCount);
     })
+  })
+  
+  app.post('/addProduct', (req, res) => {
+      const newProduct = req.body;
+      console.log('adding new event: ', newProduct)
+      productCollection.insertOne(newProduct)
+      .then(result => {
+          console.log('inserted count', result.insertedCount);
+          res.send(result.insertedCount > 0)
+      })
   })
 
   app.get('/products', (req, res) => {
@@ -48,12 +59,18 @@ client.connect(err => {
   })
   
   app.get('/client/:email', (req, res) => {
-  		console.log(req.params.email);
         ordersCollection.find({ clientGmail:req.params.email })
         .toArray( (err, documents) => {
             res.send(documents);
         })
     })
+    
+    app.delete('/delete/:id', (req, res) => {
+      const id = ObjectId(req.params.id);
+      console.log('delete this', id);
+      productCollection.deleteOne({_id: id})
+      .then(documents => res.send(!!documents.value))
+  })
   
 });
 
