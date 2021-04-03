@@ -65,11 +65,20 @@ client.connect(err => {
         })
     })
     
-    app.delete('/delete/:id', (req, res) => {
+    app.delete('/delete/product/:id', (req, res) => {
       const id = ObjectId(req.params.id);
-      console.log('delete this', id);
       productCollection.deleteOne({_id: id})
-      .then(documents => res.send(!!documents.value))
+      .then(result => {
+      	res.send(result.deletedCount > 0);
+      })
+  })
+  
+  app.delete('/delete/order/:id', (req, res) => {
+      const id = ObjectId(req.params.id);
+      ordersCollection.deleteOne({_id: id})
+      .then(result => {
+      	res.send(result.deletedCount > 0);
+      })
   })
   
 });
